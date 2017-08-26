@@ -3,4 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="gameTopBG">#1976d2</color>
+    <color name="gamePlayButtonBG">#1E88E5</color>
+    <color name="gameAnswerBG">#2196F3</color>
+    <color name="gameKeyboardBG">#42A5F5</color>
 </resources>

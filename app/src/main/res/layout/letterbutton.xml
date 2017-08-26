@@ -8,7 +8,7 @@
         android:id="@+id/btn"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@drawable/buttonshape"
+        android:background="@drawable/lettershape"
         android:shadowColor="#7188AB"
         android:shadowDx="8"
         android:shadowDy="8"
