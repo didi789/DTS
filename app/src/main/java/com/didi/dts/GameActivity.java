@@ -1,5 +1,6 @@
 package com.didi.dts;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
@@ -17,14 +18,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     String[] letters = {"א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת", "ם", "ן", "ץ", "ף"};
     Button answerF[] = new Button[8];   // Max song name first word for now - 8
-    Button answerS[] = new Button[6];   // Max song name secodn word for now - 6
-    String text = "שיר לניחוש";
-
+    Button answerS[] = new Button[6];   // Max song name second word for now - 6
+    String text = " ";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
+        Intent intent = getIntent();
+        text = intent.getStringExtra("text");
         String firstWord = text;
         String secondWord = "";
         ArrayList<String> secondWordArray = new ArrayList<>();
@@ -144,6 +145,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     public void help(View view) {
         // Show dialog to choose between 'show me the artist' to share with friends to give me 1 more second from the song...
+        // Options:
+        // "show artist name"
+        // "Give me one more second from the song"
+        // Give me one letter"
         // according to the points.....
     }
 }
