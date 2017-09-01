@@ -20,6 +20,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Button answerF[] = new Button[8];   // Max song name first word for now - 8
     Button answerS[] = new Button[6];   // Max song name second word for now - 6
     String text = " ";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,9 +37,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         ArrayList<String> firstWordArray = new ArrayList<>(Arrays.asList(firstWord.split("(?!^)")));
-        ArrayList<String> WordsArray = new ArrayList<>();
-        WordsArray.addAll(firstWordArray);
-        WordsArray.addAll(secondWordArray);
+        ArrayList<String> arrLetters = new ArrayList<>();
+        arrLetters.addAll(firstWordArray);
+        arrLetters.addAll(secondWordArray);
 
         // Fix first answer width and height according to the word
         float width = 50;
@@ -65,6 +66,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onClick(View v) {
                     ((Button) v).setText("");
+                    findViewById((Integer) v.getTag()).setClickable(true);
+                    findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -78,6 +81,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onClick(View v) {
                     ((Button) v).setText("");
+                    findViewById((Integer) v.getTag()).setClickable(true);
+                    findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -85,17 +90,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Random randomGenerator = new Random();
         int random = randomGenerator.nextInt(24);  //0 to 25, heb letters
 
-        while (WordsArray.size() < 14) {
-            WordsArray.add(letters[random]);
+        while (arrLetters.size() < 14) {
+            arrLetters.add(letters[random]);
             random = randomGenerator.nextInt(24);
         }
-        Collections.shuffle(WordsArray);
+        Collections.shuffle(arrLetters);
         Button keyboard[] = new Button[14];
         for (int i = 0; i < 14; i++) {
             String buttonID = "btn" + i;
             int resID = getResources().getIdentifier(buttonID, "id", getPackageName());
             keyboard[i] = ((Button) findViewById(resID));
-            keyboard[i].setText(WordsArray.get(i));
+            keyboard[i].setText(arrLetters.get(i));
             keyboard[i].setOnClickListener(this);
         }
     }
@@ -108,6 +113,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             if (b.getText().equals("")) {
                 b.setText(((Button) v).getText().toString());
+                b.setTag(v.getId());
+                v.setVisibility(View.INVISIBLE);
+                ((Button) v).setClickable(false);
                 checkForWinning();
                 return;
             }
@@ -117,6 +125,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             if (b.getText().equals("")) {
                 b.setText(((Button) v).getText().toString());
+                b.setTag(v.getId());
+                v.setVisibility(View.INVISIBLE);
+                ((Button) v).setClickable(false);
                 checkForWinning();
                 return;
             }
