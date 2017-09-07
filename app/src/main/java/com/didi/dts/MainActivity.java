@@ -1,5 +1,7 @@
 package com.didi.dts;
-
+//wifi adb
+//adb tcpip 5555
+//adb connect 192.168.0.101:5555
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
