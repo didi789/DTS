@@ -1,14 +1,22 @@
 package com.didi.dts;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,11 +28,51 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Button answerF[] = new Button[8];   // Max song name first word for now - 8
     Button answerS[] = new Button[6];   // Max song name second word for now - 6
     String text = " ";
+    int Xseconeds = 10000;
+    private CountDownTimer timer;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getApplicationContext();
         setContentView(R.layout.activity_game);
+        final MediaPlayer mPlayer = MediaPlayer.create(GameActivity.this, R.raw.song1);
+        ImageButton play = (ImageButton) findViewById(R.id.play_btn);
+        final TextView countDownTV = (TextView) findViewById(R.id.countDownTV);
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayer.start();
+                timer = new CountDownTimer(Xseconeds, 1000) {//play the song for X secondes
+
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        countDownTV.setText(Long.toString(millisUntilFinished / 1000));
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        try {
+                            mPlayer.reset();
+                            AssetFileDescriptor afd = context.getResources().openRawResourceFd(R.raw.song1);
+                            if (afd == null) return;
+                            mPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                            afd.close();
+                            try {
+                                mPlayer.prepare();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (Exception e) {
+                            Log.e("Error", "Error: " + e.toString());
+                        }
+                    }
+                }.start();
+            }
+        });
+
+
         Intent intent = getIntent();
         text = intent.getStringExtra("text");
         String firstWord = text;
@@ -115,7 +163,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 b.setText(((Button) v).getText().toString());
                 b.setTag(v.getId());
                 v.setVisibility(View.INVISIBLE);
-                ((Button) v).setClickable(false);
+                v.setClickable(false);
                 checkForWinning();
                 return;
             }
@@ -127,7 +175,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 b.setText(((Button) v).getText().toString());
                 b.setTag(v.getId());
                 v.setVisibility(View.INVISIBLE);
-                ((Button) v).setClickable(false);
+                v.setClickable(false);
                 checkForWinning();
                 return;
             }

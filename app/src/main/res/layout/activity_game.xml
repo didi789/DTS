@@ -75,6 +75,14 @@
             android:gravity="center"
             android:src="@drawable/playicon"
             android:textColor="#060308" />
+
+        <TextView
+            android:id="@+id/countDownTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center|start"
+            android:text="CountDownTimer" />
     </FrameLayout>
 
     <LinearLayout
