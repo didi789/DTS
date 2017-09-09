@@ -19,8 +19,8 @@ public class SharedPref {
     // Constants
     // ===========================================================
 
+    public static final String HANDLED_FIRST_TIME = "handled_first_time";
     private static final String PREF_NAME = "com.didi.dts";
-
     // ===========================================================
     // Fields
     // ===========================================================
