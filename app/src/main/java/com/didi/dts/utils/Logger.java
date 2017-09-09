@@ -9,7 +9,7 @@ public class Logger {
     // Constants
     // ===========================================================
 
-    public static final String TAG = "com.didi.moli-log";
+    public static final String TAG = "com.didi.dts-log";
     public static final boolean DEBUG = BuildConfig.DEBUG;
 
     // ===========================================================
