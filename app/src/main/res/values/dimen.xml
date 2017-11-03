@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="pause_bar_width">5.8dp</dimen>
+    <dimen name="pause_bar_distance">5.0dp</dimen>
+    <dimen name="pause_bar_height">15.4dp</dimen>
+</resources>

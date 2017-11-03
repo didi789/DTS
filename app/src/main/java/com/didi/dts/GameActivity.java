@@ -1,205 +1,136 @@
 package com.didi.dts;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.didi.dts.utils.PlayPauseView;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+public class GameActivity extends AppCompatActivity implements boardFragment.OnFragmentInteractionListener {
 
-    String[] letters = {"א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת", "ם", "ן", "ץ", "ף"};
-    Button answerF[] = new Button[8];   // Max song name first word for now - 8
-    Button answerS[] = new Button[6];   // Max song name second word for now - 6
+    int current = 0;
     String text = " ";
     int Xseconeds = 10000;
+    MediaPlayer mPlayer;
     private CountDownTimer timer;
     private Context context;
+    private ArrayList<Song> songList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getApplicationContext();
         setContentView(R.layout.activity_game);
-        final MediaPlayer mPlayer = MediaPlayer.create(GameActivity.this, R.raw.song1);
-        ImageButton play = (ImageButton) findViewById(R.id.play_btn);
+        initSongList();
+        mPlayer = MediaPlayer.create(GameActivity.this, songList.get(current).getLocalAudio());
+        final PlayPauseView play = (PlayPauseView) findViewById(R.id.play_pause_view);
         final TextView countDownTV = (TextView) findViewById(R.id.countDownTV);
+        final Boolean[] isPlaying = {false};
+
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlayer.start();
-                timer = new CountDownTimer(Xseconeds, 1000) {//play the song for X secondes
+                if (isPlaying[0]) {
+                    isPlaying[0] = true;
+                    play.toggle();
+                    mPlayer.pause();
+                } else {
+                    play.toggle();
+                    isPlaying[0] = true;
+                    mPlayer.start();
+                    timer = new CountDownTimer(Xseconeds, 1000) {//play the song for X secondes
 
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        countDownTV.setText(Long.toString(millisUntilFinished / 1000));
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        try {
-                            mPlayer.reset();
-                            AssetFileDescriptor afd = context.getResources().openRawResourceFd(R.raw.song1);
-                            if (afd == null) return;
-                            mPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                            afd.close();
-                            try {
-                                mPlayer.prepare();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (Exception e) {
-                            Log.e("Error", "Error: " + e.toString());
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            countDownTV.setText(Long.toString(millisUntilFinished / 1000));
                         }
-                    }
-                }.start();
+
+                        @Override
+                        public void onFinish() {
+                            try {
+                                isPlaying[0] = false;
+                                mPlayer.reset();
+                                AssetFileDescriptor afd = context.getResources().openRawResourceFd(songList.get(current).getLocalAudio());
+                                if (afd == null) return;
+                                mPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                                afd.close();
+                                try {
+                                    mPlayer.prepare();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } catch (Exception e) {
+                                Log.e("Error", "Error: " + e.toString());
+                            }
+                        }
+                    }.start();
+                }
             }
         });
 
+        // Check that the activity is using the layout version with
+        // the fragment_container FrameLayout
+        if (findViewById(R.id.fragment_container) != null) {
 
-        Intent intent = getIntent();
-        text = intent.getStringExtra("text");
-        String firstWord = text;
-        String secondWord = "";
-        ArrayList<String> secondWordArray = new ArrayList<>();
-        if (text.contains(" ")) {
-            firstWord = text.split(" ")[0];
-            secondWord = text.split(" ")[1];
-            secondWordArray.addAll((Arrays.asList(secondWord.split("(?!^)"))));
-        }
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState != null) {
+                return;
+            }
 
-        ArrayList<String> firstWordArray = new ArrayList<>(Arrays.asList(firstWord.split("(?!^)")));
-        ArrayList<String> arrLetters = new ArrayList<>();
-        arrLetters.addAll(firstWordArray);
-        arrLetters.addAll(secondWordArray);
+            // Create a new Fragment to be placed in the activity layout
+            boardFragment firstFragment = boardFragment.newInstance(getIntent().getStringExtra("text"));
 
-        // Fix first answer width and height according to the word
-        float width = 50;
-        float height = 50;
-        float textSize = 30;
-        LinearLayout.LayoutParams parms;
-        if (firstWordArray.size() > 6) {
-            width -= firstWordArray.size() * 1.3;
-            height -= firstWordArray.size() * 1.3;
-            textSize -= firstWordArray.size();
-        }
-        parms = new LinearLayout.LayoutParams((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, width, getResources().getDisplayMetrics()),
-                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height, getResources().getDisplayMetrics()));
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            //firstFragment.setArguments(getIntent().getExtras());
 
-        for (int i = 0; i < firstWordArray.size(); i++) {
-            String buttonID = "btnAF" + i;
-            int resID = getResources().getIdentifier(buttonID, "id", getPackageName());
-            answerF[i] = ((Button) findViewById(resID));
-            answerF[i].setVisibility(View.VISIBLE);
-            answerF[i].setLayoutParams(parms);
-            answerF[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
-
-            answerF[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((Button) v).setText("");
-                    findViewById((Integer) v.getTag()).setClickable(true);
-                    findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
-                }
-            });
-        }
-
-        for (int i = 0; i < secondWordArray.size(); i++) {
-            String buttonID = "btnAS" + i;
-            int resID = getResources().getIdentifier(buttonID, "id", getPackageName());
-            answerS[i] = ((Button) findViewById(resID));
-            answerS[i].setVisibility(View.VISIBLE);
-            answerS[i].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((Button) v).setText("");
-                    findViewById((Integer) v.getTag()).setClickable(true);
-                    findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
-                }
-            });
-        }
-
-        Random randomGenerator = new Random();
-        int random = randomGenerator.nextInt(24);  //0 to 25, heb letters
-
-        while (arrLetters.size() < 14) {
-            arrLetters.add(letters[random]);
-            random = randomGenerator.nextInt(24);
-        }
-        Collections.shuffle(arrLetters);
-        Button keyboard[] = new Button[14];
-        for (int i = 0; i < 14; i++) {
-            String buttonID = "btn" + i;
-            int resID = getResources().getIdentifier(buttonID, "id", getPackageName());
-            keyboard[i] = ((Button) findViewById(resID));
-            keyboard[i].setText(arrLetters.get(i));
-            keyboard[i].setOnClickListener(this);
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, firstFragment).commit();
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        // get the text from the button and insert into the answer buttons
-        for (Button b : answerF) {
-            if (b == null)
-                break;
-            if (b.getText().equals("")) {
-                b.setText(((Button) v).getText().toString());
-                b.setTag(v.getId());
-                v.setVisibility(View.INVISIBLE);
-                v.setClickable(false);
-                checkForWinning();
-                return;
-            }
+    public void nextSong(View v) {
+        current++;
+        boardFragment nextFragment = boardFragment.newInstance(songList.get(current).getName());
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, nextFragment).commit();
+        mPlayer.reset();
+        AssetFileDescriptor afd = context.getResources().openRawResourceFd(songList.get(current).getLocalAudio());
+        if (afd == null) return;
+        try {
+            mPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        for (Button b : answerS) {
-            if (b == null)
-                break;
-            if (b.getText().equals("")) {
-                b.setText(((Button) v).getText().toString());
-                b.setTag(v.getId());
-                v.setVisibility(View.INVISIBLE);
-                v.setClickable(false);
-                checkForWinning();
-                return;
-            }
+
+        try {
+            mPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private void checkForWinning() {
-        String userAnswer = "";
-        for (Button b : answerF) {
-            if (b == null)
-                break;
-            userAnswer += b.getText().toString();
-        }
-        if (answerS[0] != null) {
-            userAnswer += " ";
-            for (Button b : answerS) {
-                if (b == null)
-                    break;
-                userAnswer += b.getText().toString();
-            }
-        }
-        if (userAnswer.equals(text)) {
-            Toast.makeText(this, "כל הכבוד!", Toast.LENGTH_SHORT).show();
-        }
+
+    private void initSongList() {
+        songList = new ArrayList<>();
+        songList.add(new Song("מתוק כשמר לי", "אליעד נחום", "https://www.youtube.com/results?search_query=מתוק+כשמר+לי", R.raw.song1));
+        songList.add(new Song("לב חופשי", "מוקי", "https://www.youtube.com/results?search_query=לב חופשי", R.raw.song2));
+        songList.add(new Song("אלף כבאים", "גידי גוב", "https://www.youtube.com/results?search_query=אלף כבאים", R.raw.song3));
+        songList.add(new Song("מיאמי", "אליעד נחום", "https://www.youtube.com/results?search_query=מיאמי", R.raw.song4));
     }
 
     public void help(View view) {
@@ -209,5 +140,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         // "Give me one more second from the song"
         // Give me one letter"
         // according to the points.....
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

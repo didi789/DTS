@@ -9,7 +9,14 @@ public class Song {
     private String strName;
     private String strAuthor;
     private String strYoutubeURL;
-    private String strLocalAudio;
+    private int strLocalAudio;
+
+    public Song(String Name, String Author, String YoutubeURL, int LocalAudio) {
+        this.strName = Name;
+        this.strAuthor = Author;
+        this.strYoutubeURL = YoutubeURL;
+        this.strLocalAudio = LocalAudio;
+    }
 
     public String getName() {
         return (this.strName);
@@ -35,11 +42,11 @@ public class Song {
         this.strYoutubeURL = strYoutubeURL;
     }
 
-    public String getLocalAudio() {
+    public int getLocalAudio() {
         return (this.strLocalAudio);
     }
 
-    public void setLocalAudio(String strLocalAudio) {
+    public void setLocalAudio(int strLocalAudio) {
         this.strLocalAudio = strLocalAudio;
     }
 }

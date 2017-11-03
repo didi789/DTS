@@ -7,4 +7,6 @@
     <color name="gamePlayButtonBG">#1E88E5</color>
     <color name="gameAnswerBG">#2196F3</color>
     <color name="gameKeyboardBG">#42A5F5</color>
+    <color name="purple">#7c4dff</color>
+    <color name="blue">#1E88E5</color>
 </resources>
