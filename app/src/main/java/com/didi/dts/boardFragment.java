@@ -69,7 +69,7 @@ public class boardFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_board, container, false);
+        final View rootview = inflater.inflate(R.layout.fragment_board, container, false);
 
         String firstWord = mParam1;
         String secondWord = "";
@@ -101,7 +101,7 @@ public class boardFragment extends Fragment implements View.OnClickListener {
         for (int i = 0; i < firstWordArray.size(); i++) {
             String buttonID = "btnAF" + i;
             int resID = getResources().getIdentifier(buttonID, "id", getActivity().getPackageName());
-            answerF[i] = ((Button) v.findViewById(resID));
+            answerF[i] = ((Button) rootview.findViewById(resID));
             answerF[i].setVisibility(View.VISIBLE);
             answerF[i].setLayoutParams(parms);
             answerF[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
@@ -110,8 +110,10 @@ public class boardFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onClick(View v) {
                     ((Button) v).setText("");
-                    v.findViewById((Integer) v.getTag()).setClickable(true);
-                    v.findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
+                    if (v.getTag() != null) {
+                        rootview.findViewById((Integer) v.getTag()).setClickable(true);
+                        rootview.findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
+                    }
                 }
             });
         }
@@ -119,14 +121,16 @@ public class boardFragment extends Fragment implements View.OnClickListener {
         for (int i = 0; i < secondWordArray.size(); i++) {
             String buttonID = "btnAS" + i;
             int resID = getResources().getIdentifier(buttonID, "id", getActivity().getPackageName());
-            answerS[i] = ((Button) v.findViewById(resID));
+            answerS[i] = ((Button) rootview.findViewById(resID));
             answerS[i].setVisibility(View.VISIBLE);
             answerS[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ((Button) v).setText("");
-                    v.findViewById((Integer) v.getTag()).setClickable(true);
-                    v.findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
+                    if (v.getTag() != null) {
+                        rootview.findViewById((Integer) v.getTag()).setClickable(true);
+                        rootview.findViewById((Integer) v.getTag()).setVisibility(View.VISIBLE);
+                    }
                 }
             });
         }
@@ -143,12 +147,12 @@ public class boardFragment extends Fragment implements View.OnClickListener {
         for (int i = 0; i < 14; i++) {
             String buttonID = "btn" + i;
             int resID = getResources().getIdentifier(buttonID, "id", getActivity().getPackageName());
-            keyboard[i] = ((Button) v.findViewById(resID));
+            keyboard[i] = ((Button) rootview.findViewById(resID));
             keyboard[i].setText(arrLetters.get(i));
             keyboard[i].setOnClickListener(this);
         }
 
-        return v;
+        return rootview;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

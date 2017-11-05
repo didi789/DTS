@@ -3,4 +3,33 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="choose_help">בחר עזרה</string>
+
+    <!-- Order is important here: -->
+    <string-array name="help_names">
+        <item>זמן נוסף לשיר</item>
+        <item>אות נוספת</item>
+        <item>מעבר שיר</item>
+    </string-array>
+
+    <string-array name="help_credit">
+        <item>5</item>
+        <item>10</item>
+        <item>25</item>
+    </string-array>
+
+    <string-array name="help_codes">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="country_flags">
+        <item>@drawable/usa</item>
+        <item>@drawable/denmark</item>
+        <item>@drawable/sweden</item>
+        <item>@drawable/norway</item>
+    </string-array>
+
+
 </resources>

@@ -1,16 +1,22 @@
 package com.didi.dts;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.didi.dts.utils.HelpDialogActivity;
 import com.didi.dts.utils.PlayPauseView;
 
 import java.io.IOException;
@@ -22,6 +28,7 @@ public class GameActivity extends AppCompatActivity implements boardFragment.OnF
     String text = " ";
     int Xseconeds = 10000;
     MediaPlayer mPlayer;
+    boardFragment firstFragment;
     private CountDownTimer timer;
     private Context context;
     private ArrayList<Song> songList;
@@ -36,6 +43,17 @@ public class GameActivity extends AppCompatActivity implements boardFragment.OnF
         final PlayPauseView play = (PlayPauseView) findViewById(R.id.play_pause_view);
         final TextView countDownTV = (TextView) findViewById(R.id.countDownTV);
         final Boolean[] isPlaying = {false};
+
+        final Intent intent = new Intent(this, HelpDialogActivity.class);
+        Button help_btn = (Button) findViewById(R.id.help);
+        help_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(intent, 1);
+            }
+        });
+
+
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,7 +108,7 @@ public class GameActivity extends AppCompatActivity implements boardFragment.OnF
             }
 
             // Create a new Fragment to be placed in the activity layout
-            boardFragment firstFragment = boardFragment.newInstance(getIntent().getStringExtra("text"));
+            firstFragment = boardFragment.newInstance(getIntent().getStringExtra("text"));
 
             // In case this activity was started with special instructions from an
             // Intent, pass the Intent's extras to the fragment as arguments
@@ -102,11 +120,25 @@ public class GameActivity extends AppCompatActivity implements boardFragment.OnF
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            String helpCode = data.getStringExtra(HelpDialogActivity.RESULT_CONTRYCODE);
+            Toast.makeText(this, "בחרת בעזרה בקוד: " + helpCode, Toast.LENGTH_LONG).show();
+        }
+    }
+
     public void nextSong(View v) {
         current++;
-        boardFragment nextFragment = boardFragment.newInstance(songList.get(current).getName());
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, nextFragment).commit();
+        firstFragment = boardFragment.newInstance(songList.get(current).getName());
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.replace(R.id.fragment_container, firstFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+
         mPlayer.reset();
         AssetFileDescriptor afd = context.getResources().openRawResourceFd(songList.get(current).getLocalAudio());
         if (afd == null) return;
